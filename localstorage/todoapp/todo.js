@@ -1,108 +1,197 @@
-const note = document.querySelector('#note')
 const submitBtn = document.forms['add-todo']
-const list = document.querySelector('#todo-list')
-// const item = document.querySelector('#todo-item')
-const div = document.createElement('div')
 
-const todos = []
+let todos = []
 let count = 0
-const createTodo = (value) => {
+
+const todosLStore = window.localStorage.getItem('todos')
+console.log('todosLStore', todosLStore)
+
+const updateTodo = () => window.localStorage.setItem('todos', JSON.stringify(todos))
+
+const createTodo = (todoText) => {
   console.log('createTodo')
-  const todo = { id: ++count, value }
+  const todo = { id: ++count, todoText }
   todos.push(todo)
   displayTodo(todo.id)
+  updateTodo()
 }
 
-const updateTodo = (event) => {
-  console.log('updatTodo : ', event)
-}
-
-let toggle = false
 const displayTodo = (id) => {
   console.log('displayTodo', todos)
+
   const inputText = document.createElement('input')
+
   todos.forEach(todo => {
     console.log('displayTodo todo : ', todo)
     if (todo.id === id) {
+      const list = document.querySelector('#todo-list')
       const inputCheckbox = document.createElement('input')
       const divElement = document.createElement('div')
 
       inputText.setAttribute('type', 'text')
-      inputText.value = todo.value
+      inputText.value = todo.todoText
       inputText.classList.add('todo')
-
+      inputCheckbox.setAttribute('id', 'checkbox')
       inputCheckbox.setAttribute('type', 'checkbox')
+
       divElement.setAttribute('class', 'todo-item')
       divElement.setAttribute('id', id)
 
       divElement.appendChild(inputCheckbox)
       divElement.appendChild(inputText)
-      // item.appendChild(divElement)
       list.appendChild(divElement)
+
+      createDiv(todo)
+
+      inputCheckbox.checked = todo.isChecked
+
+      if (todo.isChecked) {
+        console.log('todo.isChecked ', todo.isChecked, inputText)
+        inputText.style.textDecoration = 'line-through'
+        inputText.style.background = '#c38181'
+      } else {
+        inputText.style.textDecoration = ''
+        inputText.style.background = ''
+      }
       inputText.addEventListener('click', (event) => {
-        console.log('addEventListener : ', event)
-        createDiv(event, todo.id, toggle, divElement.getAttribute('id'))
+        console.log('addEventListener : ', event.target)
+        const editItem = divElement.querySelector('.edit-item')
+        if (editItem.style.display === 'block') {
+          console.log('if block')
+          editItem.style.display = 'none'
+        } else {
+          console.log('else none')
+          editItem.style.display = 'block'
+        }
+      })
+
+      inputText.addEventListener('change', (event) => {
+        todo.todoText = event.target.value
+        console.log('todo', todo)
+
+        updateTodo(todo)
+      })
+
+      inputCheckbox.addEventListener('change', () => {
+        todo.isChecked = inputCheckbox.checked
+        console.log('todo', todo)
+        updateTodo(todo)
+        if (todo.isChecked) {
+          console.log('todo.isChecked ', todo.isChecked, inputText)
+          inputText.style.textDecoration = 'line-through'
+          inputText.style.background = '#c38181'
+        } else {
+          inputText.style.textDecoration = ''
+          inputText.style.background = ''
+        }
       })
     }
   })
 }
 
-const toggleOnClick = (layout) => {
-  console.log('toggleOnClick')
-  toggle = true
-  if (div.style.display === 'block') {
-    console.log('if block')
-    // toggle = true
-    div.style.display = 'none'
-  } else {
-    console.log('else none')
-    div.style.display = 'block'
+const createDiv = (todo) => {
+  console.log('createDiv', todo)
+
+  const textArea = document.createElement('textarea')
+  const selectList = document.createElement('select')
+  const inputDateTime = document.createElement('input')
+  const deleteBtn = document.createElement('button')
+  const div = document.createElement('div')
+
+  // const textAreaLabel = document.createElement('label')
+  // textAreaLabel.textContent = 'Note'
+  const selectLabel = document.createElement('label')
+  selectLabel.textContent = 'Priority'
+  const dueDateLabel = document.createElement('label')
+  dueDateLabel.textContent = 'DueDate'
+
+  textArea.setAttribute('id', 'text-area')
+  textArea.setAttribute('placeholder', 'Notes')
+  todo.todoNote ? textArea.value = todo.todoNote : textArea.value = textArea.getAttribute('placeholder')
+
+  selectList.setAttribute('id', 'select')
+  // Create array of options to be added
+  const prority = ['Select', 'High', 'Medium', 'Low']
+
+  // Create and append the options
+  for (let i = 0; i < prority.length; i++) {
+    const option = document.createElement('option')
+    option.value = prority[i]
+    option.text = prority[i]
+    selectList.appendChild(option)
   }
+
+  inputDateTime.setAttribute('id', 'date-time')
+  inputDateTime.setAttribute('type', 'datetime-local')
+  inputDateTime.setAttribute('value', todo.dueDate)
+  todo.prority ? selectList.value = todo.prority : selectList.value = 'Select'
+  div.setAttribute('class', 'edit-item')
+  div.style.display = 'none'
+  deleteBtn.setAttribute('id', 'deleteTodo')
+  deleteBtn.textContent = 'Delete'
+
+  // textAreaLabel.appendChild(textArea)
+  selectLabel.appendChild(selectList)
+  dueDateLabel.appendChild(inputDateTime)
+
+  div.appendChild(textArea)
+  div.appendChild(selectLabel)
+  div.appendChild(dueDateLabel)
+  div.appendChild(deleteBtn)
+
+  const layout = document.getElementById(`${todo.id}`)
+  layout.appendChild(div)
+
+  textArea.addEventListener('change', (event) => {
+    todo.todoNote = event.target.value
+    console.log('todo', todo.todoNote)
+    updateTodo(todo)
+  })
+  inputDateTime.addEventListener('change', (event) => {
+    todo.dueDate = event.target.value
+    console.log('todo', todo)
+    updateTodo(todo)
+  })
+  selectList.addEventListener('change', (event) => {
+    todo.prority = event.target.value
+    console.log('todo', todo)
+    updateTodo(todo)
+  })
+  deleteBtn.addEventListener('click', (event) => {
+    const deleteEle = document.getElementById(todo.id)
+    console.log('deleteEle', deleteEle)
+    deleteEle.remove()
+
+    todos = todos.filter(item => {
+      console.log('deleteEle', todo.id, item.id)
+      return todo.id !== item.id
+    })
+    console.log('deleteEle', todos)
+    updateTodo()
+  })
 }
 
-const createDiv = (event, id, toggle, actualID) => {
-  toggle = !toggle
-  console.log('appendDiv', event.target.value, toggle)
+if (todosLStore === null || todosLStore === []) {
+  updateTodo()
+} else {
+  todos = JSON.parse(todosLStore)
+  if (todos.length > 0) {
+    console.log('todos intial :', todos, todos[todos.length - 1])
+    todos[todos.length - 1].id ? count = todos[todos.length - 1].id : count = 0
 
-  if (toggle) {
-    console.log('toggle', event.target.value, toggle, id, actualID)
-    const textArea = document.createElement('textarea')
-    const selectList = document.createElement('select')
-    const inputDateTime = document.createElement('input')
-
-    textArea.setAttribute('id', 'text-area')
-    textArea.value = event.target.value
-
-    selectList.setAttribute('id', 'select')
-    // Create array of options to be added
-    const prority = ['High', 'Medium', 'Low']
-
-    // Create and append the options
-    for (let i = 0; i < prority.length; i++) {
-      const option = document.createElement('option')
-      option.value = prority[i]
-      option.text = prority[i]
-      selectList.appendChild(option)
-    }
-
-    inputDateTime.setAttribute('id', 'date-time')
-    inputDateTime.setAttribute('type', 'datetime-local')
-    inputDateTime.setAttribute('value', 'dd/mm/yyyy')
-    div.setAttribute('class', 'edit-item')
-    // div.style.display = 'block'
-    div.appendChild(textArea)
-    div.appendChild(selectList)
-    div.appendChild(inputDateTime)
-    const layout = document.getElementById(`${id}`)
-    layout.appendChild(div)
+    todos.forEach(todo => {
+      displayTodo(todo.id)
+    })
+  } else {
+    updateTodo()
   }
-  toggleOnClick()
 }
 
 submitBtn.addEventListener('submit', (event) => {
   event.preventDefault()
-  if (note.value.trim()) {
-    createTodo(note.value.trim())
+  const todoText = document.querySelector('#todoText')
+  if (todoText.value.trim()) {
+    createTodo(todoText.value.trim())
   }
-  note.value = ''
+  todoText.value = ''
 })
