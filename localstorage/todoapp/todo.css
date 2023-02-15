@@ -1,37 +1,52 @@
-#wrapper {
-  background-color: #fcd1c0;
-  border: 5px solid rebeccapurple;
-  background-color: lightgray;
-  padding: 40px;
-  padding-left: 350px;
+* {
+    background-color: #fcd1c0;
+}
+
+#wrapper {  
+    padding: 40px;
+    padding-left: 350px;
+    height: 100%;
   }
 
-  #add-todo, #todo-list, .todo-item{
+  #add-todo, #todo-list, .todo-item, label, #deleteTodo {
     padding: 10px;
   }
-  #todoText{
+
+  #todoText, .todo {
     width:400px;  
   }
 
-  .todo{
-    width:400px;
-  }
-  #text-area{
+  #text-area {
     padding: 10px;
     width: 310px;
     height: 160px;
     resize: none;
   }
-  button, label{
+
+  button {
     background-color: grey;
+    padding: 3px;
+  }
+
+  button:hover {
+    background: #c5d1a3;
+  }
+
+  .checkbox:checked + .todo-text {
+    text-decoration: line-through;
+    background: #c38181;
+  }
+
+/* add .edit-item-open class */
+  .edit-item {
     padding: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap; 
+    justify-content: center;
+    align-items: flex-start;
+    border: 1px solid black;
   }
-  button:hover{
-    background: #cad666;
-  }
-  label{
-    display:block;
-    width: 310px;
-  }
+
 
 

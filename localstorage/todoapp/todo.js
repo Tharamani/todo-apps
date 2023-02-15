@@ -1,115 +1,85 @@
-const submitBtn = document.forms['add-todo']
 
 let todos = []
-let count = 0
 
-const todosLStore = window.localStorage.getItem('todos')
-console.log('todosLStore', todosLStore)
-
-const updateTodo = () => window.localStorage.setItem('todos', JSON.stringify(todos))
-
-const createTodo = (todoText) => {
-  console.log('createTodo')
-  const todo = { id: ++count, todoText }
-  todos.push(todo)
-  displayTodo(todo.id)
-  updateTodo()
+// Get data from local storage
+const read = () => {
+  return window.localStorage.getItem('todos')
 }
 
-const displayTodo = (id) => {
-  console.log('displayTodo', todos)
+// Set data to local storage
+const updateData = () => {
+  console.log('updateData', todos)
+  return window.localStorage.setItem('todos', JSON.stringify(todos))
+}
 
+const createItem = (todo) => {
+  console.log('createItem ', todo)
   const inputText = document.createElement('input')
+  const inputCheckbox = document.createElement('input')
+  const todoItem = document.createElement('div') // rename to todoItem
 
-  todos.forEach(todo => {
-    console.log('displayTodo todo : ', todo)
-    if (todo.id === id) {
-      const list = document.querySelector('#todo-list')
-      const inputCheckbox = document.createElement('input')
-      const divElement = document.createElement('div')
+  inputText.setAttribute('class', 'todo-text') // remove id attr, set class attr
+  inputText.setAttribute('type', 'text')
+  inputText.value = todo.todoText
 
-      inputText.setAttribute('type', 'text')
-      inputText.value = todo.todoText
-      inputText.classList.add('todo')
-      inputCheckbox.setAttribute('id', 'checkbox')
-      inputCheckbox.setAttribute('type', 'checkbox')
+  inputCheckbox.setAttribute('class', 'checkbox')// remove id attr, set class attr
+  inputCheckbox.setAttribute('type', 'checkbox')
+  inputCheckbox.checked = todo.isChecked
 
-      divElement.setAttribute('class', 'todo-item')
-      divElement.setAttribute('id', id)
+  todoItem.setAttribute('id', todo.id)
+  todoItem.setAttribute('class', 'todo-item')
+  todoItem.appendChild(inputCheckbox)
+  todoItem.appendChild(inputText)
 
-      divElement.appendChild(inputCheckbox)
-      divElement.appendChild(inputText)
-      list.appendChild(divElement)
+  // if (todo.isChecked) {
+  //   inputText.style.textDecoration = 'line-through'
+  //   inputText.style.background = '#c38181'
+  // }
 
-      createDiv(todo)
-
-      inputCheckbox.checked = todo.isChecked
-
-      if (todo.isChecked) {
-        console.log('todo.isChecked ', todo.isChecked, inputText)
-        inputText.style.textDecoration = 'line-through'
-        inputText.style.background = '#c38181'
-      } else {
-        inputText.style.textDecoration = ''
-        inputText.style.background = ''
-      }
-      inputText.addEventListener('click', (event) => {
-        console.log('addEventListener : ', event.target)
-        const editItem = divElement.querySelector('.edit-item')
-        if (editItem.style.display === 'block') {
-          console.log('if block')
-          editItem.style.display = 'none'
-        } else {
-          console.log('else none')
-          editItem.style.display = 'block'
-        }
-      })
-
-      inputText.addEventListener('change', (event) => {
-        todo.todoText = event.target.value
-        console.log('todo', todo)
-
-        updateTodo(todo)
-      })
-
-      inputCheckbox.addEventListener('change', () => {
-        todo.isChecked = inputCheckbox.checked
-        console.log('todo', todo)
-        updateTodo(todo)
-        if (todo.isChecked) {
-          console.log('todo.isChecked ', todo.isChecked, inputText)
-          inputText.style.textDecoration = 'line-through'
-          inputText.style.background = '#c38181'
-        } else {
-          inputText.style.textDecoration = ''
-          inputText.style.background = ''
-        }
-      })
-    }
+  // Event listeners
+  inputText.addEventListener('click', () => {
+    const editItem = todoItem.querySelector('.edit-item')
+    editItem.style.display === 'block' ? editItem.style.display = 'none' : editItem.style.display = 'block'
   })
+
+  inputText.addEventListener('change', (event) => {
+    todo.todoText = event.target.value
+    updateData()
+  })
+
+  inputCheckbox.addEventListener('change', () => {
+    todo.isChecked = inputCheckbox.checked
+    updateData()
+    // if (todo.isChecked) {
+    //   inputText.style.textDecoration = 'line-through'
+    //   inputText.style.background = '#c38181'
+    // } else {
+    //   inputText.style.textDecoration = ''
+    //   inputText.style.background = ''
+    // }
+  })
+
+  return todoItem
 }
 
-const createDiv = (todo) => {
-  console.log('createDiv', todo)
-
+const createEditItem = (todo) => {
   const textArea = document.createElement('textarea')
-  const selectList = document.createElement('select')
+  const priorityList = document.createElement('select')
   const inputDateTime = document.createElement('input')
   const deleteBtn = document.createElement('button')
-  const div = document.createElement('div')
-
-  // const textAreaLabel = document.createElement('label')
-  // textAreaLabel.textContent = 'Note'
-  const selectLabel = document.createElement('label')
-  selectLabel.textContent = 'Priority'
+  const editItemDiv = document.createElement('div')
+  const editLabelDiv = document.createElement('div')
+  const priorityLabel = document.createElement('label')
   const dueDateLabel = document.createElement('label')
-  dueDateLabel.textContent = 'DueDate'
 
-  textArea.setAttribute('id', 'text-area')
+  priorityLabel.textContent = 'Priority  '
+  dueDateLabel.textContent = 'DueDate  '
+
+  textArea.setAttribute('class', 'text-area') // remove id, add class
   textArea.setAttribute('placeholder', 'Notes')
-  todo.todoNote ? textArea.value = todo.todoNote : textArea.value = textArea.getAttribute('placeholder')
-
-  selectList.setAttribute('id', 'select')
+  todo.todoNote ? textArea.value = todo.todoNote : textArea.value = ''
+  // createPriorityList
+  priorityList.setAttribute('id', 'select')
   // Create array of options to be added
   const prority = ['Select', 'High', 'Medium', 'Low']
 
@@ -118,80 +88,134 @@ const createDiv = (todo) => {
     const option = document.createElement('option')
     option.value = prority[i]
     option.text = prority[i]
-    selectList.appendChild(option)
+    priorityList.appendChild(option)
   }
 
   inputDateTime.setAttribute('id', 'date-time')
   inputDateTime.setAttribute('type', 'datetime-local')
   inputDateTime.setAttribute('value', todo.dueDate)
-  todo.prority ? selectList.value = todo.prority : selectList.value = 'Select'
-  div.setAttribute('class', 'edit-item')
-  div.style.display = 'none'
-  deleteBtn.setAttribute('id', 'deleteTodo')
+
+  todo.prority ? priorityList.value = todo.prority : priorityList.value = 'Select'
+  editItemDiv.setAttribute('class', 'edit-item')
+  editItemDiv.style.display = 'none'
+  deleteBtn.setAttribute('id', 'delete-todo')
   deleteBtn.textContent = 'Delete'
 
+  editLabelDiv.setAttribute('id', 'edit-label')
+  editLabelDiv.appendChild(priorityLabel)// priorityLabel
+  editLabelDiv.appendChild(dueDateLabel)
+  editLabelDiv.appendChild(deleteBtn)
   // textAreaLabel.appendChild(textArea)
-  selectLabel.appendChild(selectList)
+  priorityLabel.appendChild(priorityList) // priorityList
   dueDateLabel.appendChild(inputDateTime)
 
-  div.appendChild(textArea)
-  div.appendChild(selectLabel)
-  div.appendChild(dueDateLabel)
-  div.appendChild(deleteBtn)
+  editItemDiv.appendChild(textArea)
+  editItemDiv.appendChild(editLabelDiv)
 
-  const layout = document.getElementById(`${todo.id}`)
-  layout.appendChild(div)
+  const item = document.getElementById(`${todo.id}`)
+  item.appendChild(editItemDiv)
 
   textArea.addEventListener('change', (event) => {
     todo.todoNote = event.target.value
-    console.log('todo', todo.todoNote)
-    updateTodo(todo)
+    updateData()
   })
+
   inputDateTime.addEventListener('change', (event) => {
     todo.dueDate = event.target.value
-    console.log('todo', todo)
-    updateTodo(todo)
+    updateData()
   })
-  selectList.addEventListener('change', (event) => {
+
+  priorityList.addEventListener('change', (event) => {
     todo.prority = event.target.value
-    console.log('todo', todo)
-    updateTodo(todo)
+    updateData()
   })
-  deleteBtn.addEventListener('click', (event) => {
+
+  deleteBtn.addEventListener('click', () => {
     const deleteEle = document.getElementById(todo.id)
-    console.log('deleteEle', deleteEle)
     deleteEle.remove()
 
     todos = todos.filter(item => {
-      console.log('deleteEle', todo.id, item.id)
       return todo.id !== item.id
     })
-    console.log('deleteEle', todos)
-    updateTodo()
+    updateData()
   })
 }
 
-if (todosLStore === null || todosLStore === []) {
-  updateTodo()
-} else {
-  todos = JSON.parse(todosLStore)
-  if (todos.length > 0) {
-    console.log('todos intial :', todos, todos[todos.length - 1])
-    todos[todos.length - 1].id ? count = todos[todos.length - 1].id : count = 0
+// Dispaly todos
+const displayTodos = (todo) => {
+  // todos.find(todo => {
+  const list = document.querySelector('#todo-list')
+  list.appendChild(createItem(todo))
+  createEditItem(todo)
+  // })
 
-    todos.forEach(todo => {
-      displayTodo(todo.id)
-    })
-  } else {
-    updateTodo()
-  }
+  // todos.forEach(todo => {
+  //   if (todoId) { // array.find()
+  //     const list = document.querySelector('#todo-list')
+  //     list.appendChild(createItem(todoId, todo))
+  //     createEditItem(todo)
+  //   }
+  // })
 }
 
-submitBtn.addEventListener('submit', (event) => {
-  event.preventDefault()
-  const todoText = document.querySelector('#todoText')
-  if (todoText.value.trim()) {
-    createTodo(todoText.value.trim())
+const getId = () => {
+  let count = 0
+
+  const setCount = () => {
+    todos = JSON.parse(read())
+    console.log('getCount', todos)
+    if (todos.length > 0) {
+      // check count = first
+      count = todos[todos.length - 1].id ? count = todos[todos.length - 1].id : count = 0
+      // todos[todos.length - 1].id ? count = todos[todos.length - 1].id : count = 0
+    }
+    console.log('getCount', count)
+    return Number(count)
   }
-  todoText.value = ''
-})
+
+  return setCount
+}
+
+// Create todo
+const createTodo = (todoText) => {
+  const count = getId()
+  let id = count()
+
+  console.log('id: ', id)
+  const todo = { id: ++id, todoText }
+  todos.push(todo)
+  displayTodos(todo)// pass todo object
+  updateData()
+}
+
+const create = () => {
+  const submitBtn = document.forms['add-todo']
+
+  // Submit todo header text
+  submitBtn.addEventListener('submit', (event) => {
+    event.preventDefault()
+    const todoText = document.querySelector('#todoText')
+    if (todoText.value.trim()) {
+      createTodo(todoText.value.trim())
+    }
+    todoText.value = ''
+  })
+}
+
+const app = () => {
+  console.log('read', read())
+  if (read() === null) {
+    updateData()
+  } else {
+    todos = JSON.parse(read())
+    if (todos.length > 0) {
+      todos.forEach(todo => {
+        displayTodos(todo)
+      })
+    }
+  }
+  create()
+}
+
+// app
+app()
