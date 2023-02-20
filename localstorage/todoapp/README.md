@@ -8,5 +8,5 @@ textArea.setAttribute('class', 'text-area') class attribute - Done
 6. Implement closure to avoid 'count' as global variable - Done
 7. Pass 'todo' object directly to functions instead of 'todo.id' while displaying todo - Done
 8. Handle styling in .css file for checkbox and inputtext - Done
-9. Create abraction for updateData function
-10. Minimize code in createEditItem function by abstraction(create functions for each elements)
+9. Create abraction for updateData function - Pending 
+10. Extract code to functions to achive abstraction(create functions for each elements) - Done
