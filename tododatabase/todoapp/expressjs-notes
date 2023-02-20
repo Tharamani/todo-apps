@@ -1,0 +1,30 @@
+Express 
+Express is a routing and middleware web framework. 
+Its a series of middleware function calls.
+
+# Middleware functions are functions that have access to the request object (req), the response object (res), and the next middleware function in the application’s request-response cycle. 
+# The next middleware function is commonly denoted by a variable named next.
+
+Middleware functions can perform the following tasks:
+
+# Execute any code.
+# Make changes to the request and the response objects.
+# End the request-response cycle.
+# Call the next middleware function in the stack.
+
+If the current middleware function does not end the request-response cycle, it must call next() to pass control to the next middleware function. Otherwise, the request will be left hanging.
+
+An Express application can use the following types of middleware:
+
+# Application-level middleware - Bind application-level middleware to an instance of the app object by using the app.use() and app.METHOD() functions.
+# This is executed for every request
+# Eg: app.use((req, res, next)=>{}), app.get('path', (req, res, next)=>{})
+
+# Router-level middleware - Router-level middleware binds to an instance of express.Router(). Load router-level middleware by using the router.use() and router.METHOD() functions. 
+# This is executed for every request to the router
+# Eg: router.use((req, res, next)=>{}), router.get('path', (req, res, next)=>{})
+
+# Error-handling middleware - except with four arguments instead of three, specifically with the signature (err, req, res, next)
+
+Built-in middleware
+Third-party middleware
