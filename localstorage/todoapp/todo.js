@@ -3,6 +3,7 @@ let todos = []
 
 // Get data from local storage
 const read = () => {
+  if (window.localStorage.getItem('todos') === null) return updateData()
   return window.localStorage.getItem('todos')
 }
 
@@ -136,20 +137,17 @@ const createPriorityList = (todo) => {
   return priorityList
 }
 
-const createPriorityLabel = (todo) => {
+const createLabel = (text) => {
   const priorityLabel = document.createElement('label')
-  priorityLabel.textContent = 'Priority  '
-  priorityLabel.appendChild(createPriorityList(todo))
-
+  priorityLabel.textContent = text
   return priorityLabel
 }
+const createPriorityLabel = (todo) => { // abstract
+  return createLabel('Priority  ').appendChild(createPriorityList(todo))
+}
 
-const createDueDateLabel = (todo) => {
-  const dueDateLabel = document.createElement('label')
-  dueDateLabel.textContent = 'DueDate  '
-  dueDateLabel.appendChild(createDateTime(todo))
-
-  return dueDateLabel
+const createDueDateLabel = (todo) => { // abstract
+  return createLabel('DueDate  ').appendChild(createDateTime(todo))
 }
 
 const createEditLabel = (todo) => {
@@ -188,32 +186,34 @@ const displayTodos = (todo) => {
   // })
 }
 
-// create unique id
-const getId = () => {
-  let count = 0
-
-  const setCount = () => {
-    todos = JSON.parse(read())
-    console.log('getCount', todos)
-    if (todos) {
-      // check count = first
-      count = todos[todos.length - 1].id ? todos[todos.length - 1].id : 0
-      // todos[todos.length - 1].id ? count = todos[todos.length - 1].id : count = 0
-    }
-    console.log('getCount', count)
-    return Number(count)
+const wrapper = {
+  count: 0,
+  setCount: function (count) {
+    this.count = count
+  },
+  getCount: function () {
+    return this.count
   }
+}
 
-  return setCount
+// create unique id
+const readCount = () => { // rename
+  todos = JSON.parse(read())
+  console.log('readCount', todos)
+  if (todos.length > 0) {
+    return todos[todos.length - 1].id
+  } else {
+    return 0
+  }
 }
 
 // Create todo
 const createTodo = (todoText) => {
-  const count = getId()
-  let id = count()
+  let id = wrapper.getCount()
 
   console.log('id: ', id)
   const todo = { id: ++id, todoText }
+  wrapper.setCount(todo.id)
   todos.push(todo)
   displayTodos(todo)// pass todo object
   updateData()
@@ -234,8 +234,10 @@ const create = () => {
 }
 
 const app = () => {
+  wrapper.setCount(readCount())
   console.log('app todos', JSON.parse(read()))
   todos = JSON.parse(read())
+  console.log('app todos', JSON.parse(read()))
   if (todos) {
     todos.forEach(todo => {
       displayTodos(todo)

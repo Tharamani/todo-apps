@@ -1,7 +1,7 @@
 const { getTodoModel, createTodoModel, updateTodoModel, deleteTodoModel } = require('../models/todo')
 
 // Get todo
-const getTodo = async (req, res) => {
+const getTodos = async (req, res) => { // getTodos
   try {
     const response = await getTodoModel()
     return res.status(200).json(response)
@@ -39,7 +39,7 @@ const editTodo = async (req, res) => {
   try {
     const id = req.params.id
     const { todoText, todoNote, dueDate, priority, isChecked } = req.body
-    // if (await getTodoByIdTodo(id) === 0) return res.status(404).json({ message: 'Resource not found' })
+
     const response = await updateTodoModel(id, todoText, todoNote, dueDate, priority, isChecked)
     console.log('editTodo : >>>>>>>>', response)
 
@@ -64,7 +64,7 @@ const editTodo = async (req, res) => {
 const deleteTodo = async (req, res) => {
   try {
     const id = req.params.id
-    // if (await getTodoByIdTodo(id) === 0) return res.status(404).json({ message: 'Resource not found' })
+
     const response = await deleteTodoModel(id)
     console.log('deleteTodo : >>>>>>>>', response)
 
@@ -75,14 +75,11 @@ const deleteTodo = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: 'Todo deleted successfully!',
-      data: {
-        row: response
-      }
+      message: 'Todo deleted successfully!'
     })
   } catch (error) {
     return res.status(500).json({ message: error.message })
   }
 }
 
-module.exports = { createTodo, getTodo, editTodo, deleteTodo }
+module.exports = { createTodo, getTodos, editTodo, deleteTodo }

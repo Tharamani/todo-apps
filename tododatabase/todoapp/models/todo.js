@@ -6,12 +6,12 @@ const getTodoModel = async () => {
   throw new Error('Failed to get todos')
 }
 
-const createTodoModel = async (todoText) => {
+const createTodoModel = async (todoText) => { // post all fields
   console.log('createTodoModel : >>>>>>>>', todoText)
   const insertQuery = `INSERT INTO todoSchema.todo (title) VALUES ('${todoText}') RETURNING todo_id, title;`
   const result = await client.query(insertQuery)
   if (result.rowCount === 1) return result.rows[0]
-  return result.rowCount
+  // return result.rowCount // null
   // throw new Error('Failed to create todo')
 }
 
@@ -21,7 +21,7 @@ const updateTodoModel = async (id, todoText, todoNote, dueDate, priority, isChec
     WHERE todo_id = ${id} RETURNING todo_id, title, notes, due_date, priority, is_checked;`
   const result = await client.query(updateQuery)
   if (result.rowCount === 1) return result.rows[0]
-  return result.rowCount
+  // return result.rowCount // null
   // throw new Error('Failed to update todo')
 }
 
